@@ -21,7 +21,7 @@ dependencies = [
     "urllib3==2.2.3",
 ]
 
-version = "1.0.5"
+version = "1.0.6"
 
 [project.scripts]
 yt-dlp-proxy = "yt_dlp_proxy.__main__:main"

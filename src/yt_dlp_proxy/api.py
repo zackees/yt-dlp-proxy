@@ -5,7 +5,6 @@ import json
 import random
 import shutil
 import subprocess
-import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -139,7 +138,7 @@ def update_proxies():
     print("All done.")
 
 
-def run_yt_dlp(args: list[str]) -> bool:
+def run_yt_dlp(args: list[str], yt_dlp_path: Path | None = None) -> bool:
     """Run yt-dlp with a randomly selected proxy."""
 
     print("Checking for proxy list...")
@@ -150,7 +149,9 @@ def run_yt_dlp(args: list[str]) -> bool:
 
     for proxy_str in iter_random_proxy_str():
         print(f"Using proxy from {proxy_str}")
-        if execute_yt_dlp_command(proxy_str=proxy_str, args=args):
+        if execute_yt_dlp_command(
+            proxy_str=proxy_str, args=args, yt_dlp_path=yt_dlp_path
+        ):
             return True
         print("Got 'Sign in to confirm' error. Trying again with another proxy...")
     return False
@@ -180,19 +181,39 @@ def iter_random_proxy_str() -> Iterator[str]:
             yield f'{proxy["host"]}:{proxy["port"]}'
 
 
-def execute_yt_dlp_command(proxy_str: str, args: list[str]) -> bool:
+def execute_yt_dlp_command(
+    proxy_str: str, args: list[str], yt_dlp_path: Path | None = None
+) -> bool:
     """Execute the yt-dlp command with the given proxy."""
 
-    yt_dlp = shutil.which("yt-dlp") or "yt-dlp"
-    yt_dlp_path = Path(yt_dlp)
+    # yt_dlp = shutil.which("yt-dlp") or "yt-dlp"
+    # yt_dlp_path = yt_dlp_path or Path(yt_dlp)
+    if yt_dlp_path is None:
+        maybe_path = shutil.which("yt-dlp")
+        if maybe_path is None:
+            print("yt-dlp not found in PATH. Please specify the path to yt-dlp")
+            return False
+        yt_dlp_path = Path(maybe_path)
 
-    cmd_str = subprocess.list2cmdline(args)
+    # cmd_str = subprocess.list2cmdline(args)
 
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        tempout = Path(tmpdirname) / "tempout"
-        command = f"{yt_dlp_path.as_posix()} --color always --proxy http://{proxy_str} {cmd_str} 2>&1 | tee tempout"
-        print(f"Executing command: {command}")
-        subprocess.run(command, shell=True)
-        with open(tempout.as_posix(), "r") as log_fl:
-            log_text = log_fl.read()
-            return "Sign in to" not in log_text and "403" not in log_text
+    full_cmd_list: list[str] = [
+        yt_dlp_path,
+        "--color",
+        "always",
+        f"--proxy=http://{proxy_str}",
+    ] + args
+
+    proc = subprocess.Popen(
+        full_cmd_list, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
+    with proc:
+        stdout = proc.stdout
+        assert stdout is not None
+        for line in stdout:
+            # print(line.decode("utf-8").strip())
+            line_str = line.decode("utf-8", errors="ignore")
+            print(line_str.strip())
+            if "Sign in to" in line_str or "403" in line_str:
+                return False
+    return True

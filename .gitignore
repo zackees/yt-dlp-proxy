@@ -168,4 +168,4 @@ proxy.json
 !.aider.conf.yml
 !.aiderignore
 proxy.json
-*.webm.*
+*.webm
