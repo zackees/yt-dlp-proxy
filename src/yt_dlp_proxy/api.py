@@ -7,6 +7,7 @@ import random
 import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 
 import requests
 
@@ -153,6 +154,21 @@ def run_yt_dlp(args: list[str]):
         except FileNotFoundError:
             print("'proxy.json' not found. Starting proxy list update...")
             update_proxies()
+
+
+def make_proxy_str() -> str:
+    """Construct a proxy string from the proxy dictionary."""
+    proxy_json: Path = Path("proxy.json")
+    proxy_txt = proxy_json.read_text()
+
+    json_data = json.loads(proxy_txt)
+
+    proxy = random.choice(json_data)
+    if proxy.get("username"):
+        return (
+            f'{proxy["username"]}:{proxy["password"]}@{proxy["host"]}:{proxy["port"]}'
+        )
+    return f'{proxy["host"]}:{proxy["port"]}'
 
 
 def execute_yt_dlp_command(proxy_str: str, args: list[str]) -> bool:
