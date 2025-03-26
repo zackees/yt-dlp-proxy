@@ -14,7 +14,7 @@ def main():
             )
         else:
             sys.argv.pop(0)
-            run_yt_dlp()
+            run_yt_dlp(sys.argv)
     except KeyboardInterrupt:
         print("Canceled by user")
 

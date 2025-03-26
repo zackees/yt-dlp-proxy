@@ -5,7 +5,6 @@ import json
 import os
 import random
 import subprocess
-import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -136,7 +135,7 @@ def update_proxies():
     print("All done.")
 
 
-def run_yt_dlp():
+def run_yt_dlp(args: list[str]):
     """Run yt-dlp with a randomly selected proxy."""
     while True:
         try:
@@ -145,7 +144,7 @@ def run_yt_dlp():
                 proxy_str = construct_proxy_string(proxy)
                 print(f"Using proxy from {proxy['city']}, {proxy['country']}")
 
-                if execute_yt_dlp_command(proxy_str):
+                if execute_yt_dlp_command(proxy_str=proxy_str, args=args):
                     os.remove("tempout")
                     break  # Exit loop if command was successful
                 print(
@@ -156,9 +155,13 @@ def run_yt_dlp():
             update_proxies()
 
 
-def execute_yt_dlp_command(proxy_str):
+def execute_yt_dlp_command(proxy_str: str, args: list[str]) -> bool:
     """Execute the yt-dlp command with the given proxy."""
-    command = f"yt-dlp --color always --proxy http://{proxy_str} {' '.join([str(arg) for arg in sys.argv])} 2>&1 | tee tempout"
+
+    cmd_str = subprocess.list2cmdline(args)
+    command = (
+        f"yt-dlp --color always --proxy http://{proxy_str} {cmd_str} 2>&1 | tee tempout"
+    )
     print(f"Executing command: {command}")
     subprocess.run(command, shell=True)
     with open("tempout", "r") as log_fl:
