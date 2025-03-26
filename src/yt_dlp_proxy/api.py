@@ -6,6 +6,7 @@ import os
 import random
 import shutil
 import subprocess
+import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -148,13 +149,12 @@ def run_yt_dlp(args: list[str]) -> bool:
         print("'proxy.json' not found. Starting proxy list update...")
         update_proxies()
 
-    while True:
-        for proxy_str in iter_random_proxy_str():
-            print(f"Using proxy from {proxy_str}")
-            if execute_yt_dlp_command(proxy_str=proxy_str, args=args):
-                os.remove("tempout")
-                return True
-            print("Got 'Sign in to confirm' error. Trying again with another proxy...")
+    for proxy_str in iter_random_proxy_str():
+        print(f"Using proxy from {proxy_str}")
+        if execute_yt_dlp_command(proxy_str=proxy_str, args=args):
+            os.remove("tempout")
+            return True
+        print("Got 'Sign in to confirm' error. Trying again with another proxy...")
     return False
 
 
@@ -189,9 +189,12 @@ def execute_yt_dlp_command(proxy_str: str, args: list[str]) -> bool:
     yt_dlp_path = Path(yt_dlp)
 
     cmd_str = subprocess.list2cmdline(args)
-    command = f"{yt_dlp_path.as_posix()} --color always --proxy http://{proxy_str} {cmd_str} 2>&1 | tee tempout"
-    print(f"Executing command: {command}")
-    subprocess.run(command, shell=True)
-    with open("tempout", "r") as log_fl:
-        log_text = log_fl.read()
-        return "Sign in to" not in log_text and "403" not in log_text
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        tempout = Path(tmpdirname) / "tempout"
+        command = f"{yt_dlp_path.as_posix()} --color always --proxy http://{proxy_str} {cmd_str} 2>&1 | tee tempout"
+        print(f"Executing command: {command}")
+        subprocess.run(command, shell=True)
+        with open(tempout.as_posix(), "r") as log_fl:
+            log_text = log_fl.read()
+            return "Sign in to" not in log_text and "403" not in log_text
