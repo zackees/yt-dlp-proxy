@@ -16,6 +16,7 @@ import requests
 from tqdm import tqdm
 
 SPEEDTEST_URL = "http://212.183.159.230/5MB.zip"
+_MAX_WORKERS = 16
 
 
 def is_valid_proxy(proxy):
@@ -98,7 +99,7 @@ def get_best_proxies(providers):
             print(f"Failed to fetch proxies from {provider.__class__.__name__}: {e}")
 
     best_proxies = []
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=_MAX_WORKERS) as executor:
         futures = {executor.submit(test_proxy, proxy): proxy for proxy in all_proxies}
         for future in tqdm(
             as_completed(futures),
