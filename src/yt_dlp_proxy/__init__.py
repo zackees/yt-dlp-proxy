@@ -12,9 +12,9 @@ class YtDLPProxy:
         return get_proxy_strings()
 
     @staticmethod
-    def execute(args: list[str]) -> None:
+    def execute(args: list[str]) -> bool:
         """If proxy.json is not found it will be created"""
-        run_yt_dlp(args)  # not sure how this works yet
+        return run_yt_dlp(args)  # not sure how this works yet
 
     @staticmethod
     def update() -> None:

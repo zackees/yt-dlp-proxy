@@ -4,6 +4,7 @@ import io
 import json
 import os
 import random
+import shutil
 import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -138,7 +139,7 @@ def update_proxies():
     print("All done.")
 
 
-def run_yt_dlp(args: list[str]):
+def run_yt_dlp(args: list[str]) -> bool:
     """Run yt-dlp with a randomly selected proxy."""
 
     print("Checking for proxy list...")
@@ -152,8 +153,9 @@ def run_yt_dlp(args: list[str]):
             print(f"Using proxy from {proxy_str}")
             if execute_yt_dlp_command(proxy_str=proxy_str, args=args):
                 os.remove("tempout")
-                break
+                return True
             print("Got 'Sign in to confirm' error. Trying again with another proxy...")
+    return False
 
 
 def get_proxy_strings() -> list[str]:
@@ -183,10 +185,11 @@ def iter_random_proxy_str() -> Iterator[str]:
 def execute_yt_dlp_command(proxy_str: str, args: list[str]) -> bool:
     """Execute the yt-dlp command with the given proxy."""
 
+    yt_dlp = shutil.which("yt-dlp") or "yt-dlp"
+    yt_dlp_path = Path(yt_dlp)
+
     cmd_str = subprocess.list2cmdline(args)
-    command = (
-        f"yt-dlp --color always --proxy http://{proxy_str} {cmd_str} 2>&1 | tee tempout"
-    )
+    command = f"{yt_dlp_path.as_posix()} --color always --proxy http://{proxy_str} {cmd_str} 2>&1 | tee tempout"
     print(f"Executing command: {command}")
     subprocess.run(command, shell=True)
     with open("tempout", "r") as log_fl:
