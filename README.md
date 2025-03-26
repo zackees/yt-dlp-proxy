@@ -1,3 +1,6 @@
+
+python3 main.py https://www.youtube.com/watch?v=Ay41fytSZQM -f bestaudio/worst --no-playlist  --no-geo-bypass --cookies ../cookies/youtube/cookies.txt
+
 ## yt-dlp-proxy Guide
 
 yt-dlp-proxy is a script designed to help you avoid throttling and bans by automatically selecting the best proxy for yt-dlp. 
