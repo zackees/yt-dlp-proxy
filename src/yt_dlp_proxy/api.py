@@ -2,7 +2,6 @@ import importlib
 import inspect
 import io
 import json
-import os
 import random
 import shutil
 import subprocess
@@ -152,7 +151,6 @@ def run_yt_dlp(args: list[str]) -> bool:
     for proxy_str in iter_random_proxy_str():
         print(f"Using proxy from {proxy_str}")
         if execute_yt_dlp_command(proxy_str=proxy_str, args=args):
-            os.remove("tempout")
             return True
         print("Got 'Sign in to confirm' error. Trying again with another proxy...")
     return False
