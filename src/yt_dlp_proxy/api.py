@@ -2,6 +2,7 @@ import importlib
 import inspect
 import io
 import json
+import logging
 import random
 import shutil
 import subprocess
@@ -17,6 +18,9 @@ from tqdm import tqdm
 
 SPEEDTEST_URL = "http://212.183.159.230/5MB.zip"
 _MAX_WORKERS = 16
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def is_valid_proxy(proxy):
@@ -204,6 +208,8 @@ def execute_yt_dlp_command(
         f"--proxy=http://{proxy_str}",
     ] + args
 
+    cmd_str = subprocess.list2cmdline(full_cmd_list)
+    logger.info("Executing yt-dlp command: %s", cmd_str)
     proc = subprocess.Popen(
         full_cmd_list, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
@@ -216,4 +222,6 @@ def execute_yt_dlp_command(
             print(line_str.strip())
             if "Sign in to" in line_str or "403" in line_str:
                 return False
+    cmd_str = subprocess.list2cmdline(full_cmd_list)
+    logger.error("could not execute yt-dlp command: %s", cmd_str)
     return True
