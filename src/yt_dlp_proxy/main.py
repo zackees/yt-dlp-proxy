@@ -1,23 +1,29 @@
-import requests
-import random
-import os
-import io
-import time
-import sys
-import subprocess
-import json
 import importlib
 import inspect
+import io
+import json
+import os
+import random
+import subprocess
+import sys
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from yt_dlp_proxy.proxy_provider import ProxyProvider
-from yt_dlp_proxy.proxy_providers import *
+
+import requests
+
+# from yt_dlp_proxy.proxy_providers import *
 from tqdm import tqdm
 
 SPEEDTEST_URL = "http://212.183.159.230/5MB.zip"
 
+
 def is_valid_proxy(proxy):
     """Check if the proxy is valid."""
-    return proxy.get("host") is not None and proxy.get("country") != "Russia" and proxy.get("country") != "RU"
+    return (
+        proxy.get("host") is not None
+        and proxy.get("country") != "Russia"
+        and proxy.get("country") != "RU"
+    )
 
 
 def construct_proxy_string(proxy):
@@ -93,7 +99,15 @@ def get_best_proxies(providers):
     best_proxies = []
     with ThreadPoolExecutor(max_workers=2) as executor:
         futures = {executor.submit(test_proxy, proxy): proxy for proxy in all_proxies}
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Testing proxies", bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_noinv_fmt}]", unit=' proxies', unit_scale=True, ncols=80):
+        for future in tqdm(
+            as_completed(futures),
+            total=len(futures),
+            desc="Testing proxies",
+            bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_noinv_fmt}]",
+            unit=" proxies",
+            unit_scale=True,
+            ncols=80,
+        ):
             result = future.result()
             if result is not None:
                 best_proxies.append(result)
@@ -103,7 +117,9 @@ def get_best_proxies(providers):
 def update_proxies():
     """Update the proxies list and save the best ones."""
     providers = []
-    for filename in os.listdir(os.path.join(os.path.dirname(__file__), "proxy_providers")):
+    for filename in os.listdir(
+        os.path.join(os.path.dirname(__file__), "proxy_providers")
+    ):
         # Check if the file is a Python module
         if filename.endswith(".py") and filename != "__init__.py":
             module_name = filename[:-3]  # Remove the '.py' suffix
@@ -130,8 +146,10 @@ def run_yt_dlp():
                 if execute_yt_dlp_command(proxy_str):
                     os.remove("tempout")
                     break  # Exit loop if command was successful
-                print("Got 'Sign in to confirm' error. Trying again with another proxy...")
-        except FileNotFoundError as e:
+                print(
+                    "Got 'Sign in to confirm' error. Trying again with another proxy..."
+                )
+        except FileNotFoundError:
             print("'proxy.json' not found. Starting proxy list update...")
             update_proxies()
 

@@ -167,3 +167,4 @@ proxy.json
 .aider*
 !.aider.conf.yml
 !.aiderignore
+proxy.json

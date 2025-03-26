@@ -1,10 +1,13 @@
 import requests
-from proxy_provider import ProxyProvider
+
+from yt_dlp_proxy.proxy_provider import ProxyProvider
+
 
 class SandVPNProvider(ProxyProvider):
     """
     Fetch proxies from SandVPN browser extension
     """
+
     PROXIES_LIST_URL = "https://api.sandvpn.com/fetch-free-proxys"
 
     def fetch_proxies(self):

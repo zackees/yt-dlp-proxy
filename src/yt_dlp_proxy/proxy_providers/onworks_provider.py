@@ -1,10 +1,13 @@
 import requests
-from proxy_provider import ProxyProvider
+
+from yt_dlp_proxy.proxy_provider import ProxyProvider
+
 
 class VPNOnlineProvider(ProxyProvider):
     """
     Fetch proxies from VPNOnline browser extension
     """
+
     PROXIES_LIST_URL = "https://www.onworks.net/vpn.json?v=07"
 
     def fetch_proxies(self):
@@ -20,8 +23,12 @@ class VPNOnlineProvider(ProxyProvider):
                     "country": server["country"].upper(),
                     "host": server["proxy"].split(":")[0],
                     "port": server["proxy"].split(":")[1],
-                    "username": response_json["data"]["servers"]["10501"]["credentials"]["username"],
-                    "password": response_json["data"]["servers"]["10501"]["credentials"]["password"]
+                    "username": response_json["data"]["servers"]["10501"][
+                        "credentials"
+                    ]["username"],
+                    "password": response_json["data"]["servers"]["10501"][
+                        "credentials"
+                    ]["password"],
                 }
             )
         return return_list
