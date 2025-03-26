@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "yt-dlp-proxy"
-version = "0.1.0"
+version = "1.0.0"
 description = "A tool for running yt-dlp with the best free proxy"
 readme = "README.md"
 requires-python = ">=3.10"
