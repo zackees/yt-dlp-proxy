@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yt-dlp-proxy"
+version = "0.1.0"
+description = "A tool for running yt-dlp with the best free proxy"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+dependencies = [
+    "certifi==2024.8.30",
+    "charset-normalizer==3.4.0",
+    "idna==3.10",
+    "requests==2.32.3",
+    "tqdm==4.67.1",
+    "urllib3==2.2.3",
+]
+
+[project.scripts]
+yt-dlp-proxy = "main:main"
+
+[tool.setuptools]
+packages = ["proxy_providers"]
+
+[tool.black]
+line-length = 88
+target-version = ["py37"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
