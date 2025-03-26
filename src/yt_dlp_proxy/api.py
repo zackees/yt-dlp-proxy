@@ -79,9 +79,9 @@ def download_with_progress(response, f, total_length, start_time):
     return round(time.perf_counter() - start_time, 2), downloaded_bytes
 
 
-def save_proxies_to_file(proxies, filename="proxy.json"):
+def save_proxies_to_file(proxies) -> None:
     """Save the best proxies to a JSON file."""
-    with open(os.path.join(os.path.dirname(__file__), filename), "w") as f:
+    with open("proxy.json", "w") as f:
         json.dump(proxies, f, indent=4)
 
 
