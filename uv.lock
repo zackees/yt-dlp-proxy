@@ -149,7 +149,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "certifi", specifier = "==2024.8.30" },
+    { name = "certifi", specifier = ">=2024.8.30" },
     { name = "charset-normalizer", specifier = "==3.4.0" },
     { name = "idna", specifier = "==3.10" },
     { name = "requests", specifier = "==2.32.3" },
