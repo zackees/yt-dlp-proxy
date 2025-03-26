@@ -22,10 +22,10 @@ dependencies = [
 ]
 
 [project.scripts]
-yt-dlp-proxy = "main:main"
+yt-dlp-proxy = "yt_dlp_proxy.main:main"
 
 [tool.setuptools]
-packages = ["proxy_providers"]
+package-dir = {"" = "src"}
 
 [tool.black]
 line-length = 88

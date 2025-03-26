@@ -9,8 +9,8 @@ import json
 import importlib
 import inspect
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from proxy_provider import ProxyProvider
-from proxy_providers import *
+from yt_dlp_proxy.proxy_provider import ProxyProvider
+from yt_dlp_proxy.proxy_providers import *
 from tqdm import tqdm
 
 SPEEDTEST_URL = "http://212.183.159.230/5MB.zip"
