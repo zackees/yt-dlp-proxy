@@ -123,7 +123,7 @@ def update_proxies():
         # Check if the file is a Python module
         if filename.endswith(".py") and filename != "__init__.py":
             module_name = filename[:-3]  # Remove the '.py' suffix
-            module_path = f'{"proxy_providers"}.{module_name}'
+            module_path = f'{"yt_dlp_proxy.proxy_providers"}.{module_name}'
             module = importlib.import_module(module_path)
             classes = inspect.getmembers(module, inspect.isclass)
             providers.append(
