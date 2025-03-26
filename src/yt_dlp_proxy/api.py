@@ -8,6 +8,7 @@ import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from typing import Iterator
 
 import requests
 
@@ -138,37 +139,44 @@ def update_proxies():
 
 def run_yt_dlp(args: list[str]):
     """Run yt-dlp with a randomly selected proxy."""
+
+    print("Checking for proxy list...")
+
+    if not Path("proxy.json").exists():
+        print("'proxy.json' not found. Starting proxy list update...")
+        update_proxies()
+
     while True:
-        try:
-            with open("proxy.json", "r") as f:
-                proxy = random.choice(json.load(f))
-                proxy_str = construct_proxy_string(proxy)
-                print(f"Using proxy from {proxy['city']}, {proxy['country']}")
-
-                if execute_yt_dlp_command(proxy_str=proxy_str, args=args):
-                    os.remove("tempout")
-                    break  # Exit loop if command was successful
-                print(
-                    "Got 'Sign in to confirm' error. Trying again with another proxy..."
-                )
-        except FileNotFoundError:
-            print("'proxy.json' not found. Starting proxy list update...")
-            update_proxies()
+        for proxy_str in iter_random_proxy_str():
+            print(f"Using proxy from {proxy_str}")
+            if execute_yt_dlp_command(proxy_str=proxy_str, args=args):
+                os.remove("tempout")
+                break
+            print("Got 'Sign in to confirm' error. Trying again with another proxy...")
 
 
-def make_proxy_str() -> str:
+def get_proxy_strings() -> list[str]:
+    """Construct a proxy string from the proxy dictionary."""
+    all_strings = list(iter_random_proxy_str())
+    return all_strings
+
+
+def iter_random_proxy_str() -> Iterator[str]:
     """Construct a proxy string from the proxy dictionary."""
     proxy_json: Path = Path("proxy.json")
     proxy_txt = proxy_json.read_text()
 
     json_data = json.loads(proxy_txt)
 
-    proxy = random.choice(json_data)
-    if proxy.get("username"):
-        return (
-            f'{proxy["username"]}:{proxy["password"]}@{proxy["host"]}:{proxy["port"]}'
-        )
-    return f'{proxy["host"]}:{proxy["port"]}'
+    while True:
+        proxy = random.choice(json_data)
+        # print(f"Trying proxy: {proxy}")
+        if proxy.get("username"):
+            yield (
+                f'{proxy["username"]}:{proxy["password"]}@{proxy["host"]}:{proxy["port"]}'
+            )
+        else:
+            yield f'{proxy["host"]}:{proxy["port"]}'
 
 
 def execute_yt_dlp_command(proxy_str: str, args: list[str]) -> bool:

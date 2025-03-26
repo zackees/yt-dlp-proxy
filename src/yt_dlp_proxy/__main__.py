@@ -3,7 +3,7 @@ import sys
 from yt_dlp_proxy.api import run_yt_dlp, update_proxies
 
 
-def main():
+def main() -> None:
     """Main function to handle script arguments and execute the appropriate command."""
     try:
         if "update" in sys.argv:

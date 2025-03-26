@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.scripts]
-yt-dlp-proxy = "yt_dlp_proxy.main:main"
+yt-dlp-proxy = "yt_dlp_proxy.__main__:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

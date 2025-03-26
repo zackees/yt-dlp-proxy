@@ -1,4 +1,4 @@
-from .api import execute_yt_dlp_command, run_yt_dlp, update_proxies
+from .api import execute_yt_dlp_command, get_proxy_strings, run_yt_dlp, update_proxies
 
 
 class YtDLPProxy:
@@ -6,6 +6,10 @@ class YtDLPProxy:
     @staticmethod
     def execute(proxy_str: str, args: list[str]) -> None:
         execute_yt_dlp_command(proxy_str=proxy_str, args=args)
+
+    @staticmethod
+    def load_proxy_strings() -> list[str]:
+        return get_proxy_strings()
 
     @staticmethod
     def update_and_execute(args: list[str]) -> None:
